@@ -1,0 +1,283 @@
+[gd_scene load_steps=28 format=3 uid="uid://e6hrtln6o6gf"]
+
+[ext_resource type="PackedScene" uid="uid://dkpis7w2h85hp" path="res://Characters/Enemies/Enemy.tscn" id="1"]
+[ext_resource type="Script" path="res://Characters/Enemies/Flying Creature/FlyingCreatureFSM.gd" id="3"]
+[ext_resource type="Texture2D" uid="uid://5s650l0opflc" path="res://Art/v1.1 dungeon crawler 16x16 pixel pack/effects (new)/enemy_afterdead_explosion_anim_spritesheet.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://dqdknm24jobfr" path="res://Art(1)/super k/suber k 1.png" id="4_6itra"]
+[ext_resource type="Script" path="res://Characters/Hitbox.gd" id="5"]
+[ext_resource type="Texture2D" uid="uid://bqc4d175hb4er" path="res://Art(1)/super k/suber k 2.png" id="5_s6fp7"]
+[ext_resource type="Script" path="res://Characters/Enemies/Flying Creature/FlyingCreature.gd" id="6"]
+[ext_resource type="Texture2D" uid="uid://b5fx4vq3bo261" path="res://Art(1)/super k/suber k 3.png" id="6_j14nw"]
+[ext_resource type="Texture2D" uid="uid://bawvbbivs2gj5" path="res://Art(1)/super k/suber k 4.png" id="7_l0462"]
+[ext_resource type="Texture2D" uid="uid://bnwyulnjgf0pi" path="res://Art(1)/super k/suber k 5.png" id="8_2hpg2"]
+[ext_resource type="Texture2D" uid="uid://ckgok3kfu46nl" path="res://Art(1)/super k/suber k 6.png" id="9_5sdna"]
+[ext_resource type="Texture2D" uid="uid://ccdabnm7hptd3" path="res://Art(1)/super knight run/s knight 1.png" id="11_tvcjf"]
+[ext_resource type="Texture2D" uid="uid://c7xkdm83kkcgw" path="res://Art(1)/super knight run/s knight 2.png" id="12_p284g"]
+[ext_resource type="Texture2D" uid="uid://cx63n4p7nphpt" path="res://Art(1)/super knight run/s knight 3.png" id="13_vi0bu"]
+[ext_resource type="Texture2D" uid="uid://2mahcn8pdald" path="res://Art(1)/super knight run/s knight 4.png" id="14_80hv2"]
+[ext_resource type="Texture2D" uid="uid://dnyeaed0bxss6" path="res://Art(1)/super knight run/s knight 6.png" id="15_duhwd"]
+
+[sub_resource type="AtlasTexture" id="5"]
+atlas = ExtResource("4")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="6"]
+atlas = ExtResource("4")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="7"]
+atlas = ExtResource("4")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="8"]
+atlas = ExtResource("4")
+region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="SpriteFrames" id="9"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_6itra")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_s6fp7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_j14nw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_l0462")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_2hpg2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_5sdna")
+}],
+"loop": true,
+"name": &"attacking",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("5")
+}, {
+"duration": 1.0,
+"texture": SubResource("6")
+}, {
+"duration": 1.0,
+"texture": SubResource("7")
+}, {
+"duration": 1.0,
+"texture": SubResource("8")
+}],
+"loop": true,
+"name": &"dead",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("11_tvcjf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_p284g")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_vi0bu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_80hv2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_duhwd")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="10"]
+radius = 7.0
+
+[sub_resource type="CircleShape2D" id="11"]
+radius = 13.0384
+
+[sub_resource type="Animation" id="12"]
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": ["default", "dead"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.6, 0.7, 0.8, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [3, 0, 1, 2, 3]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("AnimatedSprite2D:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [false, true, false, true]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(1),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"queue_free"
+}]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Hitbox/CollisionShape2D:disabled")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="13"]
+length = 0.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": ["default"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3]
+}
+
+[sub_resource type="Animation" id="14"]
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": ["default"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [3]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("AnimatedSprite2D:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [false, true, false, true]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Hitbox/CollisionShape2D:disabled")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_e8el5"]
+_data = {
+"dead": SubResource("12"),
+"fly": SubResource("13"),
+"hurt": SubResource("14")
+}
+
+[node name="FlyingCreature" instance=ExtResource("1")]
+script = ExtResource("6")
+accerelation = 20
+max_speed = 50
+flying = true
+
+[node name="FiniteStateMachine" parent="." index="0"]
+script = ExtResource("3")
+
+[node name="AnimatedSprite2D" parent="." index="1"]
+sprite_frames = SubResource("9")
+
+[node name="CollisionShape2D" parent="." index="2"]
+position = Vector2(0, 1)
+shape = SubResource("10")
+
+[node name="Hitbox" type="Area2D" parent="." index="3"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" index="0"]
+position = Vector2(0, 1)
+shape = SubResource("11")
+disabled = true
+
+[node name="AnimationPlayer" parent="." index="4"]
+libraries = {
+"": SubResource("AnimationLibrary_e8el5")
+}

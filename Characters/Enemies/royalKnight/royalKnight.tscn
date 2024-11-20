@@ -1,0 +1,392 @@
+[gd_scene load_steps=35 format=3 uid="uid://brdfbrxhc1xul"]
+
+[ext_resource type="PackedScene" uid="uid://dkpis7w2h85hp" path="res://Characters/Enemies/Enemy.tscn" id="1_pi4km"]
+[ext_resource type="Script" path="res://Characters/Enemies/Goblin/GoblinFSM.gd" id="3_h7kni"]
+[ext_resource type="Texture2D" uid="uid://5s650l0opflc" path="res://Art/v1.1 dungeon crawler 16x16 pixel pack/effects (new)/enemy_afterdead_explosion_anim_spritesheet.png" id="4_m00ew"]
+[ext_resource type="Texture2D" uid="uid://bmmgbns5s2ory" path="res://boss pulo/boss pulo 1.png" id="4_tjew7"]
+[ext_resource type="Texture2D" uid="uid://djr8skecb4j7" path="res://boss pulo/boss pulo 2.png" id="5_tttwv"]
+[ext_resource type="Texture2D" uid="uid://dc6wu5tn45pc6" path="res://boss pulo/boss pulo 6.png" id="6_qtrgv"]
+[ext_resource type="Texture2D" uid="uid://cvqdtfne4b6go" path="res://Art(1)/royalSprite/knight idel/knight idel 1.png" id="7_ngmtl"]
+[ext_resource type="Texture2D" uid="uid://ddeff2sjixvw2" path="res://Art(1)/royalSprite/knight idel/knight idel 2.png" id="8_ddej4"]
+[ext_resource type="Texture2D" uid="uid://bdb8vcd2ji0eq" path="res://Art(1)/royalSprite/knight idel/knight idel 3.png" id="9_emv4r"]
+[ext_resource type="Texture2D" uid="uid://dvld24xvg4oqv" path="res://Art/v1.1 dungeon crawler 16x16 pixel pack/effects (new)/slash_effect_anim_f0.png" id="10_b5sep"]
+[ext_resource type="Texture2D" uid="uid://b0l48agbdaffr" path="res://Art(1)/royalSprite/knight idel/knight idel 4.png" id="10_d1phx"]
+[ext_resource type="Texture2D" uid="uid://bddwhwcog8cfj" path="res://Art/v1.1 dungeon crawler 16x16 pixel pack/effects (new)/slash_effect_anim_f1.png" id="11_j1ckd"]
+[ext_resource type="Texture2D" uid="uid://ck35i71a1n8df" path="res://Art(1)/royalSprite/knight idel/knight idel 5.png" id="11_vnb4e"]
+[ext_resource type="Texture2D" uid="uid://d24rip6atk5tf" path="res://Art(1)/royalSprite/knight idel/knight idel 6.png" id="12_aj1ne"]
+[ext_resource type="Texture2D" uid="uid://c4vhjh6ot4ahk" path="res://Art/v1.1 dungeon crawler 16x16 pixel pack/effects (new)/slash_effect_anim_f2.png" id="12_r2hrs"]
+[ext_resource type="Texture2D" uid="uid://bm0vq0qnnfldv" path="res://Art(1)/royalSprite/knight run/knight run 1.png" id="13_ku2jf"]
+[ext_resource type="Texture2D" uid="uid://cprrdfrjv2dpr" path="res://Art(1)/royalSprite/knight run/knight run 2.png" id="14_22q57"]
+[ext_resource type="Texture2D" uid="uid://2t4qa1wh0yuh" path="res://Art(1)/royalSprite/knight run/knight run 3.png" id="15_0jgiq"]
+[ext_resource type="Texture2D" uid="uid://chqaob5fwvvb0" path="res://Art(1)/royalSprite/knight run/knight run 4.png" id="16_enioa"]
+[ext_resource type="Texture2D" uid="uid://cd54h33ik4ssj" path="res://Art(1)/royalSprite/knight run/knight run 5.png" id="17_tg3vf"]
+[ext_resource type="Texture2D" uid="uid://cs787me1cn4ss" path="res://Art(1)/royalSprite/knight run/knight run 6.png" id="18_gxcov"]
+[ext_resource type="Texture2D" uid="uid://dfnyu2au1agfw" path="res://Art/v1.1 dungeon crawler 16x16 pixel pack/heroes/knight/weapon_sword_1.png" id="22_nmnjc"]
+
+[sub_resource type="GDScript" id="GDScript_g2210"]
+script/source = "extends Enemy
+
+const THROWABLE_KNIFE_SCENE: PackedScene = preload(\"res://Characters/Enemies/Goblin/ThrowableKnife.tscn\")
+
+const MAX_DISTANCE_TO_PLAYER: int = 22
+const MIN_DISTANCE_TO_PLAYER: int = 4
+
+@export var projectile_speed: int = 150
+
+
+var can_attack: bool = true
+
+var distance_to_player: float
+
+@onready var attack_timer: Timer = get_node(\"AttackTimer\")
+@onready var aim_raycast: RayCast2D = get_node(\"AimRayCast\")
+#@onready var Sword: Node2D = get_node(\"sword\")
+
+func _on_PathTimer_timeout() -> void:
+	if is_instance_valid(player):
+		distance_to_player = (player.position - global_position).length()
+		if distance_to_player > MAX_DISTANCE_TO_PLAYER:
+			_get_path_to_player()
+		elif distance_to_player < MIN_DISTANCE_TO_PLAYER:
+			_get_path_to_move_away_from_player()
+		else:
+			aim_raycast.target_position = player.position - global_position
+			if can_attack and state_machine.state == state_machine.states.idle and not aim_raycast.is_colliding():
+				can_attack = false
+				_throw_knife()
+				attack_timer.start()
+				
+		#var aim_direction: Vector2 = (global_position - player.position).normalized()
+		#Sword.position(aim_direction)
+	else:
+		mov_direction = Vector2.ZERO
+
+
+func _get_path_to_move_away_from_player() -> void:
+	var dir: Vector2 = (global_position - player.position).normalized()
+	navigation_agent.target_position = global_position + dir * 100
+
+func _throw_knife() -> void:
+	var projectile: Area2D = THROWABLE_KNIFE_SCENE.instantiate()
+	projectile.launch(global_position, (player.position - global_position).normalized(), projectile_speed)
+	get_tree().current_scene.add_child(projectile)
+
+func _on_AttackTimer_timeout() -> void:
+	can_attack = true
+"
+
+[sub_resource type="AtlasTexture" id="13"]
+atlas = ExtResource("4_m00ew")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="14"]
+atlas = ExtResource("4_m00ew")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="15"]
+atlas = ExtResource("4_m00ew")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="16"]
+atlas = ExtResource("4_m00ew")
+region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="SpriteFrames" id="17"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_tjew7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_tttwv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_qtrgv")
+}],
+"loop": true,
+"name": &"attacking",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("13")
+}, {
+"duration": 1.0,
+"texture": SubResource("14")
+}, {
+"duration": 1.0,
+"texture": SubResource("15")
+}, {
+"duration": 1.0,
+"texture": SubResource("16")
+}],
+"loop": true,
+"name": &"explosion",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_ngmtl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_ddej4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_emv4r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_d1phx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_vnb4e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_aj1ne")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("13_ku2jf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_22q57")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_0jgiq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_enioa")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_tg3vf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_gxcov")
+}],
+"loop": true,
+"name": &"move",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_b5sep")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_j1ckd")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_r2hrs")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_r2hrs")
+}],
+"loop": true,
+"name": &"swing",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="18"]
+radius = 4.0
+
+[sub_resource type="Animation" id="19"]
+resource_name = "dead"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": ["idle", "explosion"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.6, 0.7, 0.8, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [3, 0, 1, 2, 3]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("AnimatedSprite2D:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [false, true, false, true]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(1),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"queue_free"
+}]
+}
+
+[sub_resource type="Animation" id="20"]
+resource_name = "hurt"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": ["idle"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [3]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("AnimatedSprite2D:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [false, true, false, true]
+}
+
+[sub_resource type="Animation" id="21"]
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": ["idle"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5]
+}
+
+[sub_resource type="Animation" id="22"]
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": ["move"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_chseu"]
+_data = {
+"dead": SubResource("19"),
+"hurt": SubResource("20"),
+"idle": SubResource("21"),
+"move": SubResource("22")
+}
+
+[node name="royalKnight" instance=ExtResource("1_pi4km")]
+script = SubResource("GDScript_g2210")
+projectile_speed = 150
+
+[node name="FiniteStateMachine" parent="." index="0"]
+script = ExtResource("3_h7kni")
+
+[node name="AnimatedSprite2D" parent="." index="1"]
+sprite_frames = SubResource("17")
+animation = &"move"
+frame = 4
+frame_progress = 0.247477
+
+[node name="CollisionShape2D" parent="." index="2"]
+position = Vector2(1, 2)
+shape = SubResource("18")
+
+[node name="AnimationPlayer" parent="." index="3"]
+libraries = {
+"": SubResource("AnimationLibrary_chseu")
+}
+
+[node name="PathTimer" parent="." index="4"]
+wait_time = 0.2
+
+[node name="AttackTimer" type="Timer" parent="." index="5"]
+wait_time = 2.0
+one_shot = true
+
+[node name="AimRayCast" type="RayCast2D" parent="." index="6"]
+
+[node name="projectile_timer" type="Timer" parent="." index="8"]
+wait_time = 0.4
+
+[node name="Node2D" type="Node2D" parent="." index="9"]
+
+[node name="Sprite2D" type="Sprite2D" parent="Node2D" index="0"]
+position = Vector2(2.26006, 2.42282)
+rotation = 0.277507
+scale = Vector2(0.800526, 0.70508)
+texture = ExtResource("22_nmnjc")
+
+[connection signal="timeout" from="AttackTimer" to="." method="_on_AttackTimer_timeout"]
