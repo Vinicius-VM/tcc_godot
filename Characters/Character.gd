@@ -7,8 +7,8 @@ const HIT_EFFECT_SCENE: PackedScene = preload("res://Characters/HitEffect.tscn")
 
 const FRICTION: float = 0.15
 
-@export var max_hp: int = 2
-@export var hp: int = 2: set = set_hp
+@export var max_hp: int = 6
+@export var hp: int = 3: set = set_hp
 signal hp_changed(new_hp)
 
 @export var accerelation: int = 40

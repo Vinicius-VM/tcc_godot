@@ -42,9 +42,9 @@ func _enter_state(_previous_state: int, new_state: int) -> void:
 		states.idle:
 			animation_player.play("idle")
 		states.jump:
-			if is_instance_valid(parent.player):
-				parent.path = [parent.global_position, parent.player.position]
-				hitbox.knockback_direction = (parent.path[1] - parent.path[0]).normalized()
+			#if is_instance_valid(parent.player):
+				#parent.path = [parent.global_position, parent.player.position]
+				#hitbox.knockback_direction = (parent.path[1] - parent.path[0]).normalized()
 			animation_player.play("jump")
 		states.hurt:
 			animation_player.play("hurt")
