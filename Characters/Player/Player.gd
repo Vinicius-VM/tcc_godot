@@ -61,9 +61,9 @@ func get_input() -> void:
 		mov_direction += Vector2.UP
 
 	if not current_weapon.is_busy():
-		if Input.is_action_just_released("ui_previous_weapon"):
+		if Input.is_key_pressed(KEY_Z):
 			_switch_weapon(UP)
-		elif Input.is_action_just_released("ui_next_weapon"):
+		elif Input.is_key_pressed(KEY_X):
 			_switch_weapon(DOWN)
 		elif Input.is_action_just_pressed("ui_throw") and current_weapon.get_index() != 0:
 			_drop_weapon()

@@ -256,7 +256,7 @@ _data = {
 
 [node name="Goblin" instance=ExtResource("1")]
 script = ExtResource("5")
-projectile_speed = 150
+projectile_speed = 200
 accerelation = 30
 max_speed = 75
 

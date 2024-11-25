@@ -14,4 +14,3 @@ func _on_PathTimer_timeout() -> void:
 	if is_instance_valid(player):
 		_get_path_to_player()
 		distance_to_player = (player.position - global_position).length()
-		

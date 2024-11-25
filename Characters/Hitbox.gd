@@ -3,7 +3,7 @@ class_name Hitbox
 
 @export var damage: int = 1
 var knockback_direction: Vector2 = Vector2.ZERO
-@export var knockback_force: int = 300
+@export var knockback_force: int = 600
 
 var body_inside: bool = false
 

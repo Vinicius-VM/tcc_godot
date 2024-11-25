@@ -357,8 +357,7 @@ script = ExtResource("3_h7kni")
 [node name="AnimatedSprite2D" parent="." index="1"]
 sprite_frames = SubResource("17")
 animation = &"idle"
-frame = 1
-frame_progress = 0.0371175
+frame = 3
 
 [node name="CollisionShape2D" parent="." index="2"]
 position = Vector2(1, 2)
@@ -373,7 +372,7 @@ libraries = {
 wait_time = 0.2
 
 [node name="AttackTimer" type="Timer" parent="." index="5"]
-wait_time = 2.0
+wait_time = 4.0
 one_shot = true
 
 [node name="AimRayCast" type="RayCast2D" parent="." index="6"]

@@ -327,11 +327,11 @@ modulate = Color(1, 1, 1, 0.705882)
 texture = ExtResource("6")
 
 [node name="AnimatedSprite2D" parent="." index="2"]
-position = Vector2(-0.249999, 2.625)
-scale = Vector2(0.742188, 0.734375)
+position = Vector2(0, 2.5)
+scale = Vector2(0.667969, 0.664062)
 sprite_frames = SubResource("17")
 animation = &"jump"
-frame_progress = 0.80565
+frame = 4
 
 [node name="CollisionShape2D" parent="." index="3"]
 position = Vector2(0, 3)
@@ -355,7 +355,6 @@ autostart = true
 collision_layer = 0
 collision_mask = 2
 script = ExtResource("5")
-damage = 2
 knockback_force = 500
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" index="0"]
